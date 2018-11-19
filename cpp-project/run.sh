@@ -1,3 +1,4 @@
 #!/bin/sh
 
-make && ./universe
+make &> /dev/null
+./control_flow
