@@ -73,6 +73,6 @@ auto contains(std::vector<std::string> const& substrings)
 
 int main()
 {
-    auto const controlFlow = join('\n', filter(contains(controlFlowKeywords()), split<'\n'>(readFromFile("yourCode.txt")));
+    auto const controlFlow = join('\n', filter(contains(controlFlowKeywords()), split<'\n'>(readFromFile("yourCode.txt"))));
     std::cout << controlFlow << '\n';
 }
