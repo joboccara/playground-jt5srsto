@@ -34,13 +34,21 @@ std::vector<std::string> filter(Predicate pred, std::vector<T> const& input)
     return results;
 }
 
+int totalSize(std::vector<std::string> const& inputs)
+{
+    return std::accumulate(begin(inputs), end(inputs), 0,
+           [](int currentSize, std::string const& input)
+           {
+               return currentSize + input.size();
+           });
+}
+
 std::string join(char delimiter, std::vector<std::string> const& inputs)
 {
     if (inputs.empty()) return "";
     
     auto result = std::string{};
-    int const totalSize = std::accumulate(begin(inputs), end(inputs), 0, [](int currentSize, std::string const& input){ return currentSize + input.size(); });
-    result.reserve(totalSize);
+    result.reserve(totalSize(inputs));
     
     result.insert(end(result), begin(inputs.front()), end(inputs.front()));
     for (auto input = std::next(begin(inputs)); input != end(inputs); ++input)
@@ -63,11 +71,24 @@ std::vector<std::string> controlFlowKeywords()
     return keywords;
 }
 
+bool contains(std::string const& string, std::vector<std::string> const& substrings)
+{
+    return std::any_of(begin(substrings), end(substrings), [string](std::string const& substring){ return string.find(substring) != std::string::npos; });
+}
+
 auto contains(std::vector<std::string> const& substrings)
 {
-    return [substrings](std::string const& string)
+    return [&substrings](std::string const& string)
            {
-               return std::any_of(begin(substrings), end(substrings), [string](std::string const& substring){ return string.find(substring) != std::string::npos; });
+               return contains(string, substrings);
+           };
+}
+
+auto contains(std::vector<std::string> && substrings)
+{
+    return [substrings{std::move(substrings)}](std::string const& string)
+           {
+               return contains(string, substrings);
            };
 }
 
