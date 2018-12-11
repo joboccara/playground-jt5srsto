@@ -67,7 +67,7 @@ std::string readFromFile(std::string const& fileName)
 
 std::vector<std::string> controlFlowKeywords()
 {
-    auto const keywords = filter([](auto const& keyword){return !keyword.empty();}, split<'\n'>(readFromFile("keywords.txt")));
+    auto const keywords = filter([](auto const& keyword){return !keyword.empty();}, split<'\n'>(readFromFile("Keywords")));
     return keywords;
 }
 
@@ -94,6 +94,6 @@ auto contains(std::vector<std::string> && substrings)
 
 int main()
 {
-    auto const controlFlow = join('\n', filter(contains(controlFlowKeywords()), split<'\n'>(readFromFile("yourCode.txt"))));
+    auto const controlFlow = join('\n', filter(contains(controlFlowKeywords()), split<'\n'>(readFromFile("Code"))));
     std::cout << controlFlow << '\n';
 }
