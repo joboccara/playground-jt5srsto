@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -71,29 +72,42 @@ std::vector<std::string> controlFlowKeywords()
     return keywords;
 }
 
-bool contains(std::string const& string, std::vector<std::string> const& substrings)
+std::regex makeRegex(std::vector<std::string> const& substrings)
 {
-    return std::any_of(begin(substrings), end(substrings), [string](std::string const& substring){ return string.find(substring) != std::string::npos; });
+    if (substrings.empty()) return std::regex(".*");
+
+    auto regexPattern = std::string{'('};
+    for (auto const& substring : substrings)
+    {
+        regexPattern += "\\b" + substring + "\\b|";
+    }
+    regexPattern.back() = ')';
+    return std::regex(regexPattern);
 }
 
-auto contains(std::vector<std::string> const& substrings)
+bool contains(std::string const& string, std::regex const& regex)
 {
-    return [&substrings](std::string const& string)
+    return std::regex_search(string, regex);
+}
+
+auto contains(std::regex const& regex)
+{
+    return [&regex](std::string const& string)
            {
-               return contains(string, substrings);
+               return contains(string, regex);
            };
 }
 
-auto contains(std::vector<std::string> && substrings)
+auto contains(std::regex && regex)
 {
-    return [substrings{std::move(substrings)}](std::string const& string)
+    return [regex{std::move(regex)}](std::string const& string)
            {
-               return contains(string, substrings);
+               return contains(string, regex);
            };
 }
 
 int main()
 {
-    auto const controlFlow = join('\n', filter(contains(controlFlowKeywords()), split<'\n'>(readFromFile("Code"))));
+    auto const controlFlow = join('\n', filter(contains(makeRegex(controlFlowKeywords())), split<'\n'>(readFromFile("Code"))));
     std::cout << controlFlow << '\n';
 }
